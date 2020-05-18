@@ -1,0 +1,20 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: git-clone
+spec:
+  params:
+    - name: GIT_URL
+      type: string 
+    - name: BUILDER_IMAGE
+      type: string
+    - name: REVISION
+      type: string
+  steps:
+    - name: git-clone
+      image: $(params.BUILDER_IMAGE)
+      workingDir: $(workspaces.source)
+      command: ['git', 'clone', '-b', '${params.REVISION}', '${params.GIT_URL}']
+  workspaces:
+    - name: source
+      description: Location of source code

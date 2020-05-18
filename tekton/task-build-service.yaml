@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
-  name: buildah
+  name: build-service
 spec:
   params:
   - name: IMAGE
@@ -12,15 +12,20 @@ spec:
   - name: DOCKERFILE
     description: Path to the Dockerfile to build.
     default: ./Dockerfile
-  - name: CONTEXT
-    description: Path to the directory to use as context.
+  - name: SERVICE_NAME
+    description: Path to the microservice directory to use as context.
     default: .
   - name: TLSVERIFY
     description: Verify the TLS on the registry endpoint (for push/pull to a non-TLS registry)
-    default: "true"
+    default: "false"
   - name: FORMAT
     description: The format of the built container, oci or docker
     default: "oci"
+  - name: QUAY_USERNAME
+    description: Quay.io username
+  - name: QUAY_PASSWORD
+    description: Quay.io password
+
   workspaces:
   - name: source
 
@@ -31,8 +36,8 @@ spec:
   steps:
   - name: build
     image: $(params.BUILDER_IMAGE)
-    workingDir: $(workspaces.source.path)
-    command: ['buildah', 'bud', '--format=$(params.FORMAT)', '--tls-verify=$(params.TLSVERIFY)', '--no-cache', '-f', '$(params.DOCKERFILE)', '-t', '$(params.IMAGE)', '$(params.CONTEXT)']
+    workingDir: $(workspaces.source)
+    command: ['buildah', 'bud', '--format=$(params.FORMAT)', '--tls-verify=$(params.TLSVERIFY)', '--no-cache', '-f', '$(params.DOCKERFILE)', '-t', '$(params.IMAGE)', '$(params.SERVICE_NAME)']
     volumeMounts:
     - name: varlibcontainers
       mountPath: /var/lib/containers
@@ -41,8 +46,8 @@ spec:
 
   - name: push
     image: $(params.BUILDER_IMAGE)
-    workingDir: $(workspaces.source.path)
-    command: ['buildah', 'push', '--tls-verify=$(params.TLSVERIFY)', '--digestfile', '$(workspaces.source.path)/image-digest', '$(params.IMAGE)', 'docker://$(params.IMAGE)']
+    workingDir: $(workspaces.source)
+    command: ['buildah', 'push', '--tls-verify=$(params.TLSVERIFY)', '--digestfile', '$(workspaces.source)/image-digest', '$(params.IMAGE)', 'quay.io/jkap/$(params.IMAGE)']
     volumeMounts:
     - name: varlibcontainers
       mountPath: /var/lib/containers

@@ -1,0 +1,36 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: build-deploy-canary
+spec:
+  workspaces:
+    - name: build-deploy-workspace
+  params:
+    - name: GIT_URL
+      type: string 
+    - name: BUILDER_IMAGE
+      type: string
+    - name: REVISION
+      type: string    
+  tasks:
+    - name: git-clone
+      taskRef:
+        name: git-clone
+      params: 
+        - name: GIT_URL
+          value: "$(params.GIT_URL)"
+        - name: BUILDER_IMAGE
+          value: "$(params.BUILDER_IMAGE)"
+        - name: REVISION
+          value: "$(params.REVISION)"
+      workspaces:
+        - name: source
+          workspace: build-deploy-workspace
+    # - name: build-service
+    #   taskRef:
+    #     name: build-service
+    #   workspaces:
+    #     - name: source
+    #       workspace: build-deploy-workspace
+    #   runAfter:
+    #     - git-clone
