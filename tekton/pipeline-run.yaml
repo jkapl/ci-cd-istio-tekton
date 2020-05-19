@@ -17,4 +17,4 @@ spec:
   # workspaces:
   #   - name: build-deploy-workspace
   #     persistentVolumeClaim:
-  #       claimName: workspace-pvc
+  #       claimName: joel-ci-cd

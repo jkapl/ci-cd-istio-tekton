@@ -5,6 +5,8 @@ metadata:
 spec:
   # workspaces:
   #   - name: build-deploy-workspace
+  #     persistentVolumeClaim:
+  #       claimName: joel-ci-cd
   params:
     - name: GIT_URL
       type: string 

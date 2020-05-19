@@ -1,0 +1,52 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: pipeline-git-clone-alpha
+spec:
+  # params:
+  #   - name: appName
+  #     description: the deployment name, this value will be set as deployment name, version label and contaier name
+  #   - name: color
+  #     description: the hexa decimal color value
+  #   - name: message
+  #     description: the message like Hello, Bonjour or Hola
+  #   - name: contextDir
+  #     description: the context directory of the Java sources
+  #     default: .
+  resources:
+    - name: appSource
+      type: git
+  tasks:
+    - name: git-clone
+      taskRef:
+        name: git-clone-alpha
+      # params:
+      #   - name: contextDir
+      #     value: "$(params.contextDir)"
+      #   - name: dockerFile
+      #     value: src/main/docker/Dockerfile.jvm
+      resources:
+        inputs:
+          - name: source
+            resource: appSource
+    #     outputs:
+    #       - name: builtImage
+    #         resource: appImage
+    # - name: deploy-bgc
+    #   taskRef:
+    #     name: yq-deploy
+    #   runAfter:
+    #     - build-java-app
+    #   resources:
+    #     inputs:
+    #       - name: source
+    #         resource: appSource
+    #       - name: appImage
+    #         resource: appImage
+    #   params:
+    #     - name: appName
+    #       value: "$(params.appName)"
+    #     - name: color
+    #       value: "$(params.color)"
+    #     - name: message
+    #       value: "$(params.message)"
