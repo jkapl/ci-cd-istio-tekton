@@ -16,6 +16,7 @@ spec:
       # workingDir: $(workspaces.source)
       script: |
         git clone -b "$(params.REVISION)" "$(params.GIT_URL)"
+        cd ci-cd-istio-tekton
         RESULT_SHA="$(git rev-parse HEAD | tr -d '\n')"
         echo -n "$RESULT_SHA"
   # workspaces:

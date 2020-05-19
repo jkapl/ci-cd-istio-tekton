@@ -22,12 +22,11 @@ spec:
     - name: git-clone
       taskRef:
         name: git-clone
-      inputs:
-        params: 
-          - name: GIT_URL
-            value: "$(params.GIT_URL)"
-          - name: REVISION
-            value: "$(params.REVISION)"
+      params: 
+        - name: GIT_URL
+          value: "$(params.GIT_URL)"
+        - name: REVISION
+          value: "$(params.REVISION)"
       # workspaces:
       #   - name: source
       #     workspace: build-deploy-workspace

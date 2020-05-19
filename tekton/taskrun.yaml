@@ -1,0 +1,12 @@
+apiVersion: tekton.dev/v1beta1
+kind: TaskRun
+metadata:
+  generateName: mytaskrun-
+spec:
+  taskRef:
+    name: git-clone
+  params:
+    - name: GIT_URL
+      value: https://github.com/jkapl/ci-cd-istio-tekton
+    - name: REVISION
+      value: master
