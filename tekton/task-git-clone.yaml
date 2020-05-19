@@ -6,15 +6,18 @@ spec:
   params:
     - name: GIT_URL
       type: string 
-    - name: BUILDER_IMAGE
-      type: string
+      default: https://github.com/jkapl/ci-cd-istio-tekton
     - name: REVISION
-      type: string
+      type: string  
+      default: master
   steps:
     - name: git-clone
-      image: $(params.BUILDER_IMAGE)
-      workingDir: $(workspaces.source)
-      command: ['git', 'clone', '-b', '${params.REVISION}', '${params.GIT_URL}']
-  workspaces:
-    - name: source
-      description: Location of source code
+      image: gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/git-init:v0.12.1
+      # workingDir: $(workspaces.source)
+      script: |
+        git clone -b "$(params.REVISION)" "$(params.GIT_URL)"
+        RESULT_SHA="$(git rev-parse HEAD | tr -d '\n')"
+        echo -n "$RESULT_SHA"
+  # workspaces:
+  #   - name: source
+  #     description: Location of source code

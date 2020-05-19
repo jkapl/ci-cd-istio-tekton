@@ -3,32 +3,40 @@ kind: Pipeline
 metadata:
   name: build-deploy-canary
 spec:
-  workspaces:
-    - name: build-deploy-workspace
+  # workspaces:
+  #   - name: build-deploy-workspace
   params:
     - name: GIT_URL
       type: string 
+      default: https://github.com/jkapl/ci-cd-istio-tekton
     - name: BUILDER_IMAGE
       type: string
+      default: https://quay.io/buildah/stable:v1.14.8
     - name: REVISION
-      type: string    
+      type: string  
+      default: master
+    - name: SERVICE_NAME
+      type: string  
+      default: productpage
   tasks:
     - name: git-clone
       taskRef:
         name: git-clone
-      params: 
-        - name: GIT_URL
-          value: "$(params.GIT_URL)"
-        - name: BUILDER_IMAGE
-          value: "$(params.BUILDER_IMAGE)"
-        - name: REVISION
-          value: "$(params.REVISION)"
-      workspaces:
-        - name: source
-          workspace: build-deploy-workspace
+      inputs:
+        params: 
+          - name: GIT_URL
+            value: "$(params.GIT_URL)"
+          - name: REVISION
+            value: "$(params.REVISION)"
+      # workspaces:
+      #   - name: source
+      #     workspace: build-deploy-workspace
     # - name: build-service
     #   taskRef:
     #     name: build-service
+    #   params:
+    #     - name: SERVICE_NAME
+    #       value: "$(params.SERVICE_NAME)"
     #   workspaces:
     #     - name: source
     #       workspace: build-deploy-workspace
