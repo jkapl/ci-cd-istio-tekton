@@ -16,10 +16,12 @@ spec:
       image: gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/git-init:v0.12.1
       # workingDir: $(workspaces.source)
       script: |
+        cd $(workspaces.source.path)
         git clone -b "$(params.REVISION)" "$(params.GIT_URL)"
         cd ci-cd-istio-tekton
         RESULT_SHA="$(git rev-parse HEAD | tr -d '\n')"
+        pwd
         echo -n "$RESULT_SHA"
-  # workspaces:
-  #   - name: source
-  #     description: Location of source code
+  workspaces:
+    - name: source
+      description: Location of source code

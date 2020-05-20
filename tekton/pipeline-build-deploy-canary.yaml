@@ -3,10 +3,8 @@ kind: Pipeline
 metadata:
   name: build-deploy-canary
 spec:
-  # workspaces:
-  #   - name: build-deploy-workspace
-  #     persistentVolumeClaim:
-  #       claimName: joel-ci-cd
+  workspaces:
+    - name: build-deploy-workspace
   params:
     - name: GIT_URL
       type: string 
@@ -29,9 +27,9 @@ spec:
           value: "$(params.GIT_URL)"
         - name: REVISION
           value: "$(params.REVISION)"
-      # workspaces:
-      #   - name: source
-      #     workspace: build-deploy-workspace
+      workspaces:
+        - name: source
+          workspace: build-deploy-workspace
     # - name: build-service
     #   taskRef:
     #     name: build-service

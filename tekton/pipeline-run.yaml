@@ -14,7 +14,7 @@ spec:
       value: master
     - name: SERVICE_NAME
       value: productpage   
-  # workspaces:
-  #   - name: build-deploy-workspace
-  #     persistentVolumeClaim:
-  #       claimName: joel-ci-cd
+  workspaces:
+    - name: build-deploy-workspace
+      persistentVolumeClaim:
+        claimName: joel-ci-cd
