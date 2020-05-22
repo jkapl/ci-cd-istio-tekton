@@ -1,0 +1,53 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: canary-rollout
+spec:
+  workspaces:
+  - name: source
+
+  params:
+  - name: IMAGE
+    description: Reference of the image buildah will produce.
+  - name: SERVICE_NAME
+    description: Path to the microservice directory to use as context.
+    default: details
+  - name: TLSVERIFY
+    description: Verify the TLS on the registry endpoint (for push/pull to a non-TLS registry)
+    default: "false"
+
+  results:
+  - name: IMAGE_DIGEST
+    description: Digest of the image just built.
+
+  steps:
+  - name: create-files
+    image: docker.io/mikefarah/yq
+    securityContext:
+      privileged: true
+    script: |
+      yq w -i $(workspaces.source.path)/ci-cd-istio-tekton/kubernetes/deployment.yaml metadata.name $(params.SERVICE_NAME)-latest
+      yq w -i $(workspaces.source.path)/ci-cd-istio-tekton/kubernetes/deployment.yaml metadata.labels.app $(params.SERVICE_NAME)
+      yq w -i $(workspaces.source.path)/ci-cd-istio-tekton/kubernetes/deployment.yaml metadata.labels.version latest
+      yq w -i $(workspaces.source.path)/ci-cd-istio-tekton/kubernetes/deployment.yaml spec.selector.matchLabels.app $(params.SERVICE_NAME)
+      yq w -i $(workspaces.source.path)/ci-cd-istio-tekton/kubernetes/deployment.yaml spec.selector.matchLabels.version latest
+      yq w -i $(workspaces.source.path)/ci-cd-istio-tekton/kubernetes/deployment.yaml spec.template.metadata.labels.app $(params.SERVICE_NAME)
+      yq w -i $(workspaces.source.path)/ci-cd-istio-tekton/kubernetes/deployment.yaml spec.template.metadata.labels.version latest
+      yq w -i $(workspaces.source.path)/ci-cd-istio-tekton/kubernetes/deployment.yaml spec.template.spec.containers[0].name $(params.SERVICE_NAME)
+      yq w -i $(workspaces.source.path)/ci-cd-istio-tekton/kubernetes/deployment.yaml spec.template.spec.containers[0].image $(params.IMAGE)
+      yq w -i $(workspaces.source.path)/ci-cd-istio-tekton/istio/canary.yaml metadata.name $(params.SERVICE_NAME)
+      yq w -i $(workspaces.source.path)/ci-cd-istio-tekton/istio/canary.yaml spec.hosts $(params.SERVICE_NAME)
+      yq w -i $(workspaces.source.path)/ci-cd-istio-tekton/istio/canary.yaml spec.http[0].route[0].destination.host $(params.SERVICE_NAME)
+      yq w -i $(workspaces.source.path)/ci-cd-istio-tekton/istio/canary.yaml spec.http[0].route[0].destination.subset v1
+      yq w -i $(workspaces.source.path)/ci-cd-istio-tekton/istio/canary.yaml spec.http[0].route[0].weight 90
+      yq w -i $(workspaces.source.path)/ci-cd-istio-tekton/istio/canary.yaml spec.http[0].route[1].destination.host $(params.SERVICE_NAME)
+      yq w -i $(workspaces.source.path)/ci-cd-istio-tekton/istio/canary.yaml spec.http[0].route[1].destination.subset latest
+      yq w -i $(workspaces.source.path)/ci-cd-istio-tekton/istio/canary.yaml spec.http[0].route[1].weight 10
+
+  - name: rollout
+    image: quay.io/openshift/origin-cli:latest
+    securityContext:
+      privileged: true
+    script: |
+      oc apply -f $(workspaces.source.path)/ci-cd-istio-tekton/kubernetes/deployment.yaml -n joel-ci-cd
+      oc apply -f $(workspaces.source.path)/ci-cd-istio-tekton/istio/canary.yaml -n joel-ci-cd
