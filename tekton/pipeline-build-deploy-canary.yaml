@@ -11,7 +11,7 @@ spec:
       default: https://github.com/jkapl/ci-cd-istio-tekton
     - name: BUILDER_IMAGE
       type: string
-      default: https://quay.io/podman/stable
+      default: https://quay.io/buildah/stable
     - name: REVISION
       type: string  
       default: master

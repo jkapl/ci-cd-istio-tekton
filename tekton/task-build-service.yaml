@@ -11,7 +11,7 @@ spec:
     description: Reference of the image buildah will produce.
   - name: BUILDER_IMAGE
     description: The location of the buildah builder image.
-    default: quay.io/podman/stable
+    default: quay.io/buildah/stable
   - name: DOCKERFILE
     description: Path to the Dockerfile to build.
     default: ./Dockerfile
@@ -52,6 +52,9 @@ spec:
 
   - name: push
     image: $(params.BUILDER_IMAGE)
+    env:
+    - name: REGISTRY_AUTH_FILE
+      value: /home/builder/.docker/config.json
     # workingDir: $(workspaces.source)
     # command: ['buildah', 'push', '--tls-verify=$(params.TLSVERIFY)', '$(params.IMAGE)']
     volumeMounts:
@@ -61,7 +64,8 @@ spec:
       privileged: true
     script: |
       cd $(workspaces.source.path)/ci-cd-istio-tekton/src/$(params.SERVICE_NAME)
-      buildah push --tls-verify=$(params.TLSVERIFY) $(params.IMAGE)
+      cat ~/.docker/config.json
+      buildah push --authfile ~/.docker/config.json --tls-verify=$(params.TLSVERIFY) $(params.IMAGE)
 
   # - name: digest-to-results
   #   image: $(params.BUILDER_IMAGE)
