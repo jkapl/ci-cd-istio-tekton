@@ -12,13 +12,7 @@ spec:
   - name: SERVICE_NAME
     description: Path to the microservice directory to use as context.
     default: details
-  - name: TLSVERIFY
-    description: Verify the TLS on the registry endpoint (for push/pull to a non-TLS registry)
-    default: "false"
 
-  results:
-  - name: IMAGE_DIGEST
-    description: Digest of the image just built.
 
   steps:
   - name: create-files
@@ -50,4 +44,4 @@ spec:
       privileged: true
     script: |
       oc apply -f $(workspaces.source.path)/ci-cd-istio-tekton/kubernetes/deployment.yaml -n joel-ci-cd
-      oc apply -f $(workspaces.source.path)/ci-cd-istio-tekton/istio/canary.yaml -n joel-ci-cd
+      # oc apply -f $(workspaces.source.path)/ci-cd-istio-tekton/istio/canary.yaml -n joel-ci-cd

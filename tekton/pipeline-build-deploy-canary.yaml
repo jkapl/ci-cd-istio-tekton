@@ -46,3 +46,18 @@ spec:
           workspace: build-deploy-workspace
       runAfter:
         - git-clone
+    - name: canary-rollout
+      taskRef:
+        name: canary-rollout
+      params: 
+        - name: IMAGE
+          value: $(params.IMAGE)
+        - name: SERVICE_NAME
+          value: $(params.SERVICE_NAME)
+      workspaces:
+        - name: source
+          workspace: build-deploy-workspace
+      runAfter:
+        - build-service
+      
+        
