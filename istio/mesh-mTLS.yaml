@@ -1,0 +1,8 @@
+apiVersion: "authentication.maistra.io/v1"
+kind: "ServiceMeshPolicy"
+metadata:
+  name: "default"
+  namespace: dev-jk-cp
+spec:
+  peers:
+  - mtls: {}

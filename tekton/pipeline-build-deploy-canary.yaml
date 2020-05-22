@@ -11,13 +11,16 @@ spec:
       default: https://github.com/jkapl/ci-cd-istio-tekton
     - name: BUILDER_IMAGE
       type: string
-      default: https://quay.io/buildah/stable:v1.14.8
+      default: https://quay.io/podman/stable
     - name: REVISION
       type: string  
       default: master
     - name: SERVICE_NAME
       type: string  
       default: productpage
+    - name: IMAGE
+      type: string
+      default: quay.io/jkap/productpage:latest
   tasks:
     - name: git-clone
       taskRef:
@@ -30,14 +33,16 @@ spec:
       workspaces:
         - name: source
           workspace: build-deploy-workspace
-    # - name: build-service
-    #   taskRef:
-    #     name: build-service
-    #   params:
-    #     - name: SERVICE_NAME
-    #       value: "$(params.SERVICE_NAME)"
-    #   workspaces:
-    #     - name: source
-    #       workspace: build-deploy-workspace
-    #   runAfter:
-    #     - git-clone
+    - name: build-service
+      taskRef:
+        name: build-service
+      params:
+        - name: SERVICE_NAME
+          value: "$(params.SERVICE_NAME)"
+        - name: IMAGE
+          value: $(params.IMAGE)
+      workspaces:
+        - name: source
+          workspace: build-deploy-workspace
+      runAfter:
+        - git-clone

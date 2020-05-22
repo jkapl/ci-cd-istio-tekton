@@ -3,17 +3,20 @@ kind: PipelineRun
 metadata:
   generateName: test-run-
 spec:
+  serviceAccountName: build-bot
   pipelineRef:
     name: build-deploy-canary
   params:
     - name: GIT_URL
       value: https://github.com/jkapl/ci-cd-istio-tekton 
     - name: BUILDER_IMAGE
-      value: https://quay.io/buildah/stable:v1.14.8
+      value: https://quay.io/buildah/stable:v1.14.0
     - name: REVISION
       value: master
     - name: SERVICE_NAME
-      value: productpage   
+      value: productpage
+    - name: IMAGE 
+      value: quay.io/jkap/productpage:latest  
   workspaces:
     - name: build-deploy-workspace
       persistentVolumeClaim:

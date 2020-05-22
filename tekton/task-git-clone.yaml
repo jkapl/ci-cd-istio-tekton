@@ -15,8 +15,11 @@ spec:
     - name: git-clone
       image: gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/git-init:v0.12.1
       # workingDir: $(workspaces.source)
+      securityContext:
+        privileged: true
       script: |
         cd $(workspaces.source.path)
+        rm -rf ci-cd-istio-tekton
         git clone -b "$(params.REVISION)" "$(params.GIT_URL)"
         cd ci-cd-istio-tekton
         RESULT_SHA="$(git rev-parse HEAD | tr -d '\n')"

@@ -11,13 +11,13 @@ spec:
     description: Reference of the image buildah will produce.
   - name: BUILDER_IMAGE
     description: The location of the buildah builder image.
-    default: quay.io/buildah/stable:v1.14.8
+    default: quay.io/podman/stable
   - name: DOCKERFILE
     description: Path to the Dockerfile to build.
     default: ./Dockerfile
   - name: SERVICE_NAME
     description: Path to the microservice directory to use as context.
-    default: .
+    default: details
   - name: CONTEXT 
     description: Path to Dockerfile
     default: .
@@ -27,10 +27,10 @@ spec:
   - name: FORMAT
     description: The format of the built container, oci or docker
     default: "oci"
-  - name: QUAY_USERNAME
-    description: Quay.io username
-  - name: QUAY_PASSWORD
-    description: Quay.io password
+  # - name: QUAY_USERNAME
+  #   description: Quay.io username
+  # - name: QUAY_PASSWORD
+  #   description: Quay.io password
 
   results:
   - name: IMAGE_DIGEST
@@ -47,22 +47,25 @@ spec:
     securityContext:
       privileged: true
     script: |
-      cd $(workspaces.source.path)/src/$(params.SERVICE_NAME)
-      buildah bud --format="$(params.FORMAT)" --tls-verify="$(params.TLSVERIFY)" --no-cache -f "$(params.DOCKERFILE)" -t "$(params.IMAGE)" "$(params.CONTEXT)"
+      cd $(workspaces.source.path)/ci-cd-istio-tekton/src/$(params.SERVICE_NAME)
+      buildah bud --format=$(params.FORMAT) --tls-verify=$(params.TLSVERIFY) --no-cache -f $(params.DOCKERFILE) -t $(params.IMAGE) $(params.CONTEXT)
 
   - name: push
     image: $(params.BUILDER_IMAGE)
-    workingDir: $(workspaces.source)
-    command: ['buildah', 'push', '--tls-verify=$(params.TLSVERIFY)', '--digestfile', '$(workspaces.source)/image-digest', '$(params.IMAGE)', 'quay.io/jkap/$(params.IMAGE)']
+    # workingDir: $(workspaces.source)
+    # command: ['buildah', 'push', '--tls-verify=$(params.TLSVERIFY)', '$(params.IMAGE)']
     volumeMounts:
     - name: varlibcontainers
       mountPath: /var/lib/containers
     securityContext:
       privileged: true
+    script: |
+      cd $(workspaces.source.path)/ci-cd-istio-tekton/src/$(params.SERVICE_NAME)
+      buildah push --tls-verify=$(params.TLSVERIFY) $(params.IMAGE)
 
-  - name: digest-to-results
-    image: $(params.BUILDER_IMAGE)
-    script: cat $(workspaces.source.path)/image-digest | tee /tekton/results/IMAGE_DIGEST
+  # - name: digest-to-results
+  #   image: $(params.BUILDER_IMAGE)
+  #   script: cat $(workspaces.source.path)/image-digest | tee /tekton/results/IMAGE_DIGEST
 
   volumes:
   - name: varlibcontainers
