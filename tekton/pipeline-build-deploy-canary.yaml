@@ -18,9 +18,12 @@ spec:
     - name: SERVICE_NAME
       type: string  
       default: productpage
-    - name: IMAGE
+    - name: SERVICE_VERSION
       type: string
-      default: quay.io/jkap/productpage:latest
+      default: latest
+    - name: IMAGE_REPOSITORY
+      type: string
+      default: quay.io/jkap
   tasks:
     - name: git-clone
       taskRef:
@@ -39,8 +42,10 @@ spec:
       params:
         - name: SERVICE_NAME
           value: "$(params.SERVICE_NAME)"
-        - name: IMAGE
-          value: $(params.IMAGE)
+        - name: IMAGE_REPOSITORY
+          value: "$(params.IMAGE_REPOSITORY)"
+        - name: SERVICE_VERSION
+          value: "$(params.SERVICE_VERSION)"
       workspaces:
         - name: source
           workspace: build-deploy-workspace
@@ -50,10 +55,12 @@ spec:
       taskRef:
         name: canary-rollout
       params: 
-        - name: IMAGE
-          value: $(params.IMAGE)
         - name: SERVICE_NAME
-          value: $(params.SERVICE_NAME)
+          value: "$(params.SERVICE_NAME)"
+        - name: IMAGE_REPOSITORY
+          value: "$(params.IMAGE_REPOSITORY)"
+        - name: SERVICE_VERSION
+          value: "$(params.SERVICE_VERSION)"
       workspaces:
         - name: source
           workspace: build-deploy-workspace

@@ -7,17 +7,20 @@ spec:
   - name: source
 
   params:
-  - name: IMAGE
-    description: Reference of the image buildah will produce.
+  - name: IMAGE_REPOSITORY
+    description: Repository where buildah will push new image
   - name: BUILDER_IMAGE
-    description: The location of the buildah builder image.
+    description: The location of the buildah builder image
     default: quay.io/buildah/stable
   - name: DOCKERFILE
-    description: Path to the Dockerfile to build.
+    description: Path to the Dockerfile to build
     default: ./Dockerfile
   - name: SERVICE_NAME
-    description: Path to the microservice directory to use as context.
+    description: Path to the microservice directory to use as context
     default: details
+  - name: SERVICE_VERSION
+    description: Version of newly built service
+    default: latest
   - name: CONTEXT 
     description: Path to Dockerfile
     default: .
@@ -44,7 +47,7 @@ spec:
       privileged: true
     script: |
       cd $(workspaces.source.path)/ci-cd-istio-tekton/src/$(params.SERVICE_NAME)
-      buildah bud --format=$(params.FORMAT) --tls-verify=$(params.TLSVERIFY) --no-cache -f $(params.DOCKERFILE) -t $(params.IMAGE) $(params.CONTEXT)
+      buildah bud --format=$(params.FORMAT) --tls-verify=$(params.TLSVERIFY) --no-cache -f $(params.DOCKERFILE) -t $(params.IMAGE_REPOSITORY)/$(params.SERVICE_NAME):$(params.SERVICE_VERSION) $(params.CONTEXT)
 
   - name: push
     image: $(params.BUILDER_IMAGE)
@@ -61,11 +64,7 @@ spec:
     script: |
       cd $(workspaces.source.path)/ci-cd-istio-tekton/src/$(params.SERVICE_NAME)
       cat ~/.docker/config.json
-      buildah push --authfile ~/.docker/config.json --tls-verify=$(params.TLSVERIFY) $(params.IMAGE)
-
-  # - name: digest-to-results
-  #   image: $(params.BUILDER_IMAGE)
-  #   script: cat $(workspaces.source.path)/image-digest | tee /tekton/results/IMAGE_DIGEST
+      buildah push --authfile ~/.docker/config.json --tls-verify=$(params.TLSVERIFY) $(params.IMAGE_REPOSITORY)/$(params.SERVICE_NAME):$(params.SERVICE_VERSION)
 
   volumes:
   - name: varlibcontainers

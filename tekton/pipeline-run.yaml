@@ -15,8 +15,10 @@ spec:
       value: master
     - name: SERVICE_NAME
       value: productpage
-    - name: IMAGE 
-      value: quay.io/jkap/productpage:latest  
+    - name: IMAGE_REPOSITORY
+      value: quay.io/jkap
+    - name: SERVICE_VERSION
+      value: v2
   workspaces:
     - name: build-deploy-workspace
       persistentVolumeClaim:
