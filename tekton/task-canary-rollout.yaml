@@ -22,7 +22,7 @@ spec:
       privileged: true
     script: |
       echo Editing destination rule....
-      RULE_INDEX = $(yq r $(workspaces.source.path)/ci-cd-istio-tekton/manifests/destrule-$(params.SERVICE_NAME).yaml --length spec.subsets)
+      RULE_INDEX=$(yq r $(workspaces.source.path)/ci-cd-istio-tekton/manifests/destrule-$(params.SERVICE_NAME).yaml --length spec.subsets)
       yq w -i $(workspaces.source.path)/ci-cd-istio-tekton/manifests/destrule-$(params.SERVICE_NAME).yaml "spec.subsets[+]" name:
       yq w -i $(workspaces.source.path)/ci-cd-istio-tekton/manifests/destrule-$(params.SERVICE_NAME).yaml spec.subsets[$RULE_INDEX].name $(params.SERVICE_VERSION)
       yq w -i $(workspaces.source.path)/ci-cd-istio-tekton/manifests/destrule-$(params.SERVICE_NAME).yaml spec.subsets[$RULE_INDEX].labels.version $(params.SERVICE_VERSION)
@@ -48,17 +48,18 @@ spec:
       yq w -i $(workspaces.source.path)/ci-cd-istio-tekton/manifests/virtualservice-canary-$(params.SERVICE_NAME)-$(params.SERVICE_VERSION).yaml spec.http[0].route[0].destination.subset $(params.SERVICE_VERSION)
       yq w -i $(workspaces.source.path)/ci-cd-istio-tekton/manifests/virtualservice-canary-$(params.SERVICE_NAME)-$(params.SERVICE_VERSION).yaml spec.http[0].route[0].weight 10
       WEIGHT=$((90/$RULE_INDEX))
-      for (( dest=0; dest<RULE_INDEX-1; dest++ ))
-      do
+      dest=0
+      while [ "$dest" -lt $RULE_INDEX ]; do
         SUBSET=$(yq r $(workspaces.source.path)/ci-cd-istio-tekton/manifests/destrule-$(params.SERVICE_NAME).yaml spec.subsets[$dest].name)
         yq w -i $(workspaces.source.path)/ci-cd-istio-tekton/manifests/virtualservice-canary-$(params.SERVICE_NAME)-$(params.SERVICE_VERSION).yaml "spec.http[0].route[+]" destination:
         yq w -i $(workspaces.source.path)/ci-cd-istio-tekton/manifests/virtualservice-canary-$(params.SERVICE_NAME)-$(params.SERVICE_VERSION).yaml spec.http[0].route[$(($dest + 1))].destination.host $(params.SERVICE_NAME)
         yq w -i $(workspaces.source.path)/ci-cd-istio-tekton/manifests/virtualservice-canary-$(params.SERVICE_NAME)-$(params.SERVICE_VERSION).yaml spec.http[0].route[$(($dest + 1))].destination.subset $SUBSET
         yq w -i $(workspaces.source.path)/ci-cd-istio-tekton/manifests/virtualservice-canary-$(params.SERVICE_NAME)-$(params.SERVICE_VERSION).yaml spec.http[0].route[$(($dest + 1))].weight $WEIGHT
+        dest=$((dest+1))
       done
       TOTAL_WEIGHT=$(($RULE_INDEX*$WEIGHT))
       TOTAL_WEIGHT=$(($TOTAL_WEIGHT+10))
-      if [$TOTAL_WEIGHT -lt 100]
+      if [ $TOTAL_WEIGHT -lt 100 ]
       then
         WEIGHT_REMAIN=$((100-$TOTAL_WEIGHT))
         CURRENT_WEIGHT=$(yq r $(workspaces.source.path)/ci-cd-istio-tekton/manifests/virtualservice-canary-$(params.SERVICE_NAME)-$(params.SERVICE_VERSION).yaml spec.http[0].route[1].weight) 
@@ -70,10 +71,14 @@ spec:
     securityContext:
       privileged: true
     script: |
-      cd $(workspaces.source.path)
+      cd $(workspaces.source.path)/ci-cd-istio-tekton
       echo $(git status)
+      cat ~/.gitconfig
+      git config --global user.email "joelkaplan1@gmail.com"
+      git config --global user.name "Joel Kaplan"
       git add .
-      git commit -m 'Automated commit by Tekton: $(SERVICE_NAME):$(SERVICE_VERSION)'
+      MESSAGE="Automated commit by Tekton: $(params.SERVICE_NAME):$(params.SERVICE_VERSION)"
+      git commit -m "$MESSAGE"
       git push
   # - name: rollout
   #   image: quay.io/openshift/origin-cli:latest
