@@ -3,7 +3,7 @@ kind: PersistentVolumeClaim
 metadata:
   name: joel-ci-cd
 spec:
-  storageClassName: rook-cephfs
+  #storageClassName: rook-cephfs
   accessModes:
     - ReadWriteOnce
   resources:
