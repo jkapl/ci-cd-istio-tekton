@@ -42,7 +42,7 @@ spec:
       echo Adding virtual service...
       cp $(workspaces.source.path)/ci-cd-istio-tekton/tekton/canary-templates/virtualservice-service.yaml $(workspaces.source.path)/ci-cd-istio-tekton/manifests/virtualservice-canary-$(params.SERVICE_NAME)-$(params.SERVICE_VERSION).yaml
       yq w -i $(workspaces.source.path)/ci-cd-istio-tekton/manifests/virtualservice-canary-$(params.SERVICE_NAME)-$(params.SERVICE_VERSION).yaml metadata.name $(params.SERVICE_NAME)-$(params.SERVICE_VERSION)
-      yq w -i $(workspaces.source.path)/ci-cd-istio-tekton/manifests/virtualservice-canary-$(params.SERVICE_NAME)-$(params.SERVICE_VERSION).yaml "spec.hosts[+]" $(params.SERVICE_NAME)
+      yq w -i $(workspaces.source.path)/ci-cd-istio-tekton/manifests/virtualservice-canary-$(params.SERVICE_NAME)-$(params.SERVICE_VERSION).yaml spec.hosts[0] $(params.SERVICE_NAME)
       yq w -i $(workspaces.source.path)/ci-cd-istio-tekton/manifests/virtualservice-canary-$(params.SERVICE_NAME)-$(params.SERVICE_VERSION).yaml "spec.http[0].route[+]" destination:
       yq w -i $(workspaces.source.path)/ci-cd-istio-tekton/manifests/virtualservice-canary-$(params.SERVICE_NAME)-$(params.SERVICE_VERSION).yaml spec.http[0].route[0].destination.host $(params.SERVICE_NAME)
       yq w -i $(workspaces.source.path)/ci-cd-istio-tekton/manifests/virtualservice-canary-$(params.SERVICE_NAME)-$(params.SERVICE_VERSION).yaml spec.http[0].route[0].destination.subset $(params.SERVICE_VERSION)
