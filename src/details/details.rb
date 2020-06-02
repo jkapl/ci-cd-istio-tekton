@@ -114,7 +114,7 @@ def fetch_details_from_external_service(isbn, id, headers)
         'publisher' => book['publisher'],
         'language' => language,
         'ISBN-10' => isbn10,
-        # 'ISBN-13' => isbn13
+        'ISBN-13' => isbn13
   }
 
 end
