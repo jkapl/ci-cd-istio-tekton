@@ -19,14 +19,6 @@ spec:
         prefix: /api/v1/products
     route:
     - destination:
+        host: productpage
         port:
           number: 9080
-        host: productpage
-        subset: v2
-      weight: 10
-    - destination:
-        port:
-          number: 9080
-        host: productpage
-        subset: v1
-      weight: 90
