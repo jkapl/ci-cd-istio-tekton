@@ -68,7 +68,7 @@ def get_book_details(id, headers)
         'id' => id,
         'author': 'William Shakespeare',
         'year': 1595,
-        'type' => 'hardcover',
+        'type' => 'paperback',
         'pages' => 200,
         'publisher' => 'PublisherA',
         'language' => 'French',
