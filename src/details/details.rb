@@ -66,12 +66,12 @@ def get_book_details(id, headers)
 
     return {
         'id' => id,
-        'author': 'Billy Shakespeare',
+        'author': 'William Shakespeare',
         'year': 1595,
-        'type' => 'paperback',
+        'type' => 'hardcover',
         'pages' => 200,
         'publisher' => 'PublisherA',
-        'language' => 'English',
+        'language' => 'French',
         'ISBN-10' => '1234567890',
         'ISBN-13' => '123-1234567890'
     }
