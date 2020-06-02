@@ -101,7 +101,7 @@ def fetch_details_from_external_service(isbn, id, headers)
     book = json['items'][0]['volumeInfo']
 
     language = book['language'] === 'en'? 'English' : 'unknown'
-    type = book['printType'] === 'BOOK'? 'paperback' : 'unknown'
+    type = book['printType'] === 'BOOK'? 'hardcover' : 'unknown'
     isbn10 = get_isbn(book, 'ISBN_10')
     isbn13 = get_isbn(book, 'ISBN_13')
 
