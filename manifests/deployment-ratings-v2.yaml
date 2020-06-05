@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ratings-v2
+  labels:
+    app: ratings
+    version: v2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ratings
+      version: v2
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "true"
+      labels:
+        app: ratings
+        version: v2
+    spec:
+      containers:
+      - name: ratings
+        image: quay.io/jkap/ratings:v2
+        imagePullPolicy: IfNotPresent
