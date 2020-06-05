@@ -14,7 +14,7 @@ spec:
     - name: REVISION
       value: master
     - name: SERVICE_NAME
-      value: details
+      value: ratings
     - name: IMAGE_REPOSITORY
       value: quay.io/jkap
     - name: SERVICE_VERSION

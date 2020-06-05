@@ -71,7 +71,7 @@ def get_book_details(id, headers)
         'type' => 'paperback',
         'pages' => 200,
         'publisher' => 'PublisherA',
-        'language' => 'French',
+        'language' => 'English',
         'ISBN-10' => '1234567890',
         'ISBN-13' => '123-1234567890'
     }
